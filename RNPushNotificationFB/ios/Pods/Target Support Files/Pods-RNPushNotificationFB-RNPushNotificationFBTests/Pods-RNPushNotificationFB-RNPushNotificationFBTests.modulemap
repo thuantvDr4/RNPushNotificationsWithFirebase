@@ -1,0 +1,6 @@
+module Pods_RNPushNotificationFB_RNPushNotificationFBTests {
+  umbrella header "Pods-RNPushNotificationFB-RNPushNotificationFBTests-umbrella.h"
+
+  export *
+  module * { export * }
+}

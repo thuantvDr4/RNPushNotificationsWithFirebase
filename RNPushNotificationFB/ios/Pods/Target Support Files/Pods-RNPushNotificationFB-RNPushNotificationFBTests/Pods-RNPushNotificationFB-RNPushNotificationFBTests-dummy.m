@@ -1,0 +1,5 @@
+#import <Foundation/Foundation.h>
+@interface PodsDummy_Pods_RNPushNotificationFB_RNPushNotificationFBTests : NSObject
+@end
+@implementation PodsDummy_Pods_RNPushNotificationFB_RNPushNotificationFBTests
+@end
