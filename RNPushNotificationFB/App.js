@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import type {Node} from 'react';
 import {
   SafeAreaView,
@@ -16,42 +16,19 @@ import {
   Text,
   useColorScheme,
   View,
+    TouchableOpacity
 } from 'react-native';
 
 import {
   Colors,
-  DebugInstructions,
   Header,
-  LearnMoreLinks,
-  ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+//
+import {fcmService} from './src/FCMService';
+import {localNotificationService} from './src/LocalNotificationService';
 
-const Section = ({children, title}): Node => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-};
 
+/*------------*/
 const App: () => Node = () => {
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -59,35 +36,82 @@ const App: () => Node = () => {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.js</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
+    const [loading, setLoading] = useState(true);
+
+    /*-------*/
+  useEffect(()=>{
+        fcmService.registerAppWithFCM();
+        fcmService.register(onRegister, onNotification, onOpenNotification);
+        localNotificationService.createDefaultChannel();
+        localNotificationService.configure(onOpenLocalNotification);
+        //
+        function onRegister(token) {
+            console.log('[APP]-----onRegister', token)
+        }
+        //
+      function onNotification(notify) {
+          console.log('[APP]-----onNotification', notify);
+          const options = {
+              soundName: 'default',
+              playSound: true,
+          };
+          localNotificationService.showNotification(
+              0,
+              notify.title, //title
+              notify.body, //message
+              notify, //data
+              options, //options
+          );
+      }
+      //
+      function onOpenLocalNotification(notify) {
+          console.log('[APP]-----onOpenLocalNotification', notify);
+          alert("Open notification " + notify.body);
+      }
+
+      //
+      function onOpenNotification(notify) {
+          console.log('[APP]-----onOpenNotification', notify);
+          alert("Open notification " + notify.body);
+      }
+
+      //clean up
+        return ()=>{
+            console.log('[APP]-----Unregister');
+            fcmService.unRegister();
+            localNotificationService.unRegister();
+        }
+  },[]);
+
+
+
+
+
+    return (
+        <SafeAreaView style={backgroundStyle}>
+            <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+            <ScrollView
+                contentInsetAdjustmentBehavior="automatic"
+                style={backgroundStyle}>
+                <Header />
+                <View
+                    style={{
+                        alignItems: 'center',
+                        backgroundColor: isDarkMode ? Colors.black : Colors.white,
+                    }}>
+                    <Text>{'PushNotification with Firebase'}</Text>
+
+                    {/*-----------*/}
+                    <TouchableOpacity style={styles.btn_ctn}>
+                        <Text>{'Press me !'}</Text>
+                    </TouchableOpacity>
+
+                </View>
+
+            </ScrollView>
+        </SafeAreaView>
+    );
+
 };
 
 const styles = StyleSheet.create({
@@ -107,6 +131,14 @@ const styles = StyleSheet.create({
   highlight: {
     fontWeight: '700',
   },
+    btn_ctn:{
+      marginTop: 60,
+        height:40,
+        width:150,
+        backgroundColor: 'pink',
+        alignItems: 'center',
+        justifyContent: 'center'
+    }
 });
 
 export default App;

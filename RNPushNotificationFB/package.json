@@ -3,17 +3,20 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "android": "react-native run-android",
-    "ios": "react-native run-ios",
+    "android": "npx react-native run-android",
+    "ios": "nxp react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "clean:android" : "cd android && ./gradlew cleanBuild && cd .."
   },
   "dependencies": {
+    "@react-native-community/push-notification-ios": "^1.8.0",
     "@react-native-firebase/app": "^12.1.0",
     "@react-native-firebase/messaging": "^12.1.0",
     "react": "17.0.1",
-    "react-native": "0.64.2"
+    "react-native": "0.64.2",
+    "react-native-push-notification": "^7.3.1"
   },
   "devDependencies": {
     "@babel/core": "^7.14.5",
